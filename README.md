@@ -10,6 +10,6 @@ Produced at Brookhaven National Laboratory by:
 * Ryan Hilbert
 
 ## Built With
-* Qt - https://qt.io
+* Qt - https://www.qt.io
 * QCustomPlot - http://qcustomplot.com
 * TinyExpr - https://codeplea.com/tinyexpr
