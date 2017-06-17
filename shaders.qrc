@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+<file>shaders/gl3/phong.vert</file>
+<file>shaders/gl3/phong.frag</file>
+<file>shaders/gl3/phongalpha.frag</file>
+<file>shaders/es2/phong.vert</file>
+<file>shaders/es2/phong.frag</file>
+<file>shaders/es2/phongalpha.frag</file>
+</qresource>
+</RCC>

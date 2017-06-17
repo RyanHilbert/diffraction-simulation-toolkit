@@ -3,18 +3,18 @@
 
 Vector3D::Vector3D(QColor color,unsigned char type,QNode*parent):QEntity(parent),flipped(type&FLIP){
 	addComponent(transform);
-	QPhongMaterial*material=new QPhongMaterial(this);//
+	QPhongMaterial*material=new QPhongMaterial(this);
 	material->setShareable(true);
 	material->setAmbient(color);
 	QEntity*tail=new QEntity(this);
 	tail->addComponent(material);
 	QCylinderMesh*tailMesh=new QCylinderMesh(tail);
 	tailMesh->setLength(tailLength);
-	tailMesh->setRadius(.01);
+	tailMesh->setRadius(.01f);
 	tail->addComponent(tailMesh);
 	tail->addComponent(tailTransform);
 	if(type&AXIS){
-		tailMesh->setRadius(.009);
+		tailMesh->setRadius(.009f);
 		tailMesh->setLength(9999);
 		tailTransform->setTranslation(QVector3D(0,tailMesh->length()/2,0));
 	}else{

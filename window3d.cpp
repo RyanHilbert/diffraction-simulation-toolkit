@@ -35,6 +35,14 @@ QEntity*Window3D::sphere3D(){
 	crystal->addComponent(mesh);
 	return crystal;
 }
+QEntity*Window3D::hemisphere3D(){
+	QEntity*crystal=new QEntity(root);
+	crystal->addComponent(material);
+	crystal->addComponent(transform);
+	QSphereMesh*mesh=new QSphereMesh(crystal);
+	crystal->addComponent(mesh);
+	return crystal;
+}
 QEntity*Window3D::cylinder3D(){
 	QEntity*crystal=new QEntity(root);
 	crystal->addComponent(material);
@@ -71,6 +79,8 @@ QEntity*Window3D::bicone3D(){
 	bottomTransform->setRotationX(180);
 	topTransform->setTranslation(QVector3D(0,1,0));
 	bottomTransform->setTranslation(QVector3D(0,-1,0));
+	connect(crystal,&QEntity::enabledChanged,top,&QEntity::setEnabled);
+	connect(crystal,&QEntity::enabledChanged,bottom,&QEntity::setEnabled);
 	return crystal;
 }
 QEntity*Window3D::prism3D(){
@@ -111,12 +121,14 @@ QEntity*Window3D::bipyramid3D(){
 	bottomTransform->setRotationX(180);
 	topTransform->setTranslation(QVector3D(0,1,0));
 	bottomTransform->setTranslation(QVector3D(0,-1,0));
+	connect(crystal,&QEntity::enabledChanged,top,&QEntity::setEnabled);
+	connect(crystal,&QEntity::enabledChanged,bottom,&QEntity::setEnabled);
 	connect(this,&Window3D::updated,mesh,&QConeMesh::setSlices);
 	return crystal;
 }
 Window3D::Window3D(){
+	defaultFrameGraph()->setClearColor(Qt::black);
 	setTitle("3D");
-	defaultFramegraph()->setClearColor(Qt::black);
 	setRootEntity(root);
 
 	QRenderSettings*render=new QRenderSettings(root);
@@ -128,7 +140,7 @@ Window3D::Window3D(){
 	transform->setShareable(true);
 	transform->setRotationX(90);
 	material->setShareable(true);
-	material->setAlpha(.9);
+	material->setAlpha(.9f);
 	material->setAmbient(Qt::darkGray);
 
 	QCamera*cam=camera();
@@ -138,6 +150,7 @@ Window3D::Window3D(){
 
 	crystals[CUBOID]=cuboid3D();
 	crystals[SPHERE]=sphere3D();
+	crystals[HEMISPHERE]=hemisphere3D();
 	crystals[CYLINDER]=cylinder3D();
 	crystals[CONE]=cone3D();
 	crystals[BICONE]=bicone3D();
@@ -152,7 +165,7 @@ Window3D::Window3D(){
 	vectors[4]=hVector;
 	vectors[5]=incidentBeam;
 
-	incidentBeam->setDistance(.4);
+	incidentBeam->setDistance(.4f);
 	xaxis->setDirection(1,0,0);
 	yaxis->setDirection(0,1,0);
 	zaxis->setDirection(0,0,1);
@@ -160,8 +173,8 @@ Window3D::Window3D(){
 	update();
 }
 void Window3D::update(){
-	for(unsigned char i=0;i<sizeof(crystals)/sizeof(*crystals);++i)crystals[i]->setEnabled(false);
-	crystals[g_shape]->setEnabled(true);
+	for(size_t i=0;i<sizeof(crystals)/sizeof(*crystals);++i)crystals[i]->setEnabled(false);
+	crystals[(size_t)g_shape]->setEnabled(true);
 
 	vector raxis=rot_axis();
 	rotationAxis->setDirection(raxis.x,raxis.y,raxis.z);
@@ -176,7 +189,7 @@ void Window3D::update(){
 		max_dim=2*std::max(std::max(g_half_width,g_half_height),g_half_length);
 		transform->setScale3D(QVector3D(2*g_half_length,2*g_half_height,2*g_half_width));
 		break;
-	case SPHERE:
+	case SPHERE:case HEMISPHERE:
 		max_dim=2*g_radius;
 		transform->setScale3D(QVector3D(g_radius,g_radius,g_radius));
 		break;
@@ -192,7 +205,7 @@ void Window3D::update(){
 		max_dim=2*std::max(g_radius,g_half_height);
 		transform->setScale3D(QVector3D(g_radius,2*g_half_height,g_radius));
 	}
-	for(unsigned char i=0;i<sizeof(vectors)/sizeof(*vectors);++i)vectors[i]->setLength(max_dim*2);
+	for(size_t i=0;i<sizeof(vectors)/sizeof(*vectors);++i)vectors[i]->setLength(max_dim*2);
 	detransform->setScale3D(QVector3D(max_dim*2,1,max_dim*2));
 	botransform->setTranslation(QVector3D(0,max_dim*2.5,0));
 	toptransform->setTranslation(QVector3D(0,max_dim*2.5,0));
@@ -213,6 +226,7 @@ void Window3D::mousePressEvent(QMouseEvent*e){
 	lastMousePosition=e->pos();
 }
 void Window3D::mouseReleaseEvent(QMouseEvent*e){
+	e=e;
 	lastMousePosition=QPoint(0,0);
 }
 void Window3D::wheelEvent(QWheelEvent*e){

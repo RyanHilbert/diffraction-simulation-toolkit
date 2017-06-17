@@ -35,13 +35,15 @@ SpacingCalculator::SpacingCalculator(QWidget*parent):Dialog(parent,Qt::MSWindows
 	setMaximumSize(minimumSize());
 }
 void SpacingCalculator::calculate(){
-	double  a = edita->text().toDouble(),
+	double
+			a = edita->text().toDouble(),
 			b = editb->text().toDouble(),
 			c = editc->text().toDouble(),
 			alpha = editA->text().toDouble(),
 			beta = editB->text().toDouble(),
 			gamma = editC->text().toDouble();
-	int     h = edith->value(),
+	int
+			h = edith->value(),
 			k = editk->value(),
 			l = editl->value();
 	//above defines ints h, k, l and doubles a, b, c, alpha, beta, gamma
@@ -50,9 +52,9 @@ void SpacingCalculator::calculate(){
 	double c1, c2, tx, ty, vol, result;
 
 	//convert degree to radian
-	alpha = alpha*pi/180.0;
-	beta = beta*pi/180.0;
-	gamma = gamma*pi/180.0;
+	alpha = alpha*PI/180.0;
+	beta = beta*PI/180.0;
+	gamma = gamma*PI/180.0;
 
 	//assume vector a1 along x axis, and a2 in xy plane
 	a1 = {a, 0, 0};
@@ -93,30 +95,28 @@ void SpacingCalculator::calculate(){
 
 	spacing->setText(QString::number(result));
 }
+void SpacingCalculator::read(){
+	edita->setText(QString::number(g_a));
+	editb->setText(QString::number(g_b));
+	editc->setText(QString::number(g_c));
+	editA->setText(QString::number(g_A));
+	editB->setText(QString::number(g_B));
+	editC->setText(QString::number(g_C));
+	edith->setValue(g_h);
+	editk->setValue(g_k);
+	editl->setValue(g_l);
+}
+void SpacingCalculator::write(){
+	g_a = edita->text().toDouble();
+	g_b = editb->text().toDouble();
+	g_c = editc->text().toDouble();
+	g_A = editA->text().toDouble();
+	g_B = editB->text().toDouble();
+	g_C = editC->text().toDouble();
+	g_h = edith->value();
+	g_k = editk->value();
+	g_l = editl->value();
+}
 QString SpacingCalculator::result(){
 	return spacing->text();
-}
-void SpacingCalculator::hdf5read(){
-	hid_t group=h5group_("Calculator",h5group("Crystal",hdf5file));
-	editA->setText(QString::number(h5double("α (°)",group)));
-	editB->setText(QString::number(h5double("β (°)",group)));
-	editC->setText(QString::number(h5double("γ (°)",group)));
-	edita->setText(QString::number(h5double("a (Å)",group)));
-	editb->setText(QString::number(h5double("b (Å)",group)));
-	editc->setText(QString::number(h5double("c (Å)",group)));
-	edith->setValue(h5int("h",group));
-	editk->setValue(h5int("k",group));
-	editl->setValue(h5int_("l",group));
-}
-void SpacingCalculator::hdf5write(){
-	hid_t group=h5group_("Calculator",h5group("Crystal",hdf5file));
-	h5set_double(editA->text().toDouble(),"α (°)",group);
-	h5set_double(editB->text().toDouble(),"β (°)",group);
-	h5set_double(editC->text().toDouble(),"γ (°)",group);
-	h5set_double(edita->text().toDouble(),"a (Å)",group);
-	h5set_double(editb->text().toDouble(),"b (Å)",group);
-	h5set_double(editc->text().toDouble(),"c (Å)",group);
-	h5set_int(edith->value(),"h",group);
-	h5set_int(editk->value(),"k",group);
-	h5set_int_(editl->value(),"l",group);
 }

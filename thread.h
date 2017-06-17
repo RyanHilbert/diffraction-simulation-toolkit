@@ -11,6 +11,8 @@ public slots:
 	void stop();
 signals:
 	void starting();//emitted from the calling thread, not the new thread, unlike started()
+	void error(QString str);
+	void warning(QString str);
 	void output(QString str);
 	void maximum(int max);
 	void progress(int prg);

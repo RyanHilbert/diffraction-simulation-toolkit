@@ -61,11 +61,11 @@ void DirectionCalculator::calculate(){
 	//user input captured in vector v, defined above
 
 	//calculation code goes here
-	double wave_number=2.0*pi/(12.398/energy), x1, x2, c, bragg_angle;
+	double wave_number=2.0*PI/(12.398/energy), x1, x2, c, bragg_angle;
 	vector k0;
 
 	//calculate the reciprocal lattice vector
-	h = vec_num(2.0*pi/(vec_abs(h)*spacing),h);
+	h = vec_num(2.0*PI/(vec_abs(h)*spacing),h);
 
 	//calculate Bragg angle
 	if ((12.398/energy)/(2.0*spacing)>1.0){
@@ -78,7 +78,7 @@ void DirectionCalculator::calculate(){
 	}
 	else {
 		//calculated Bragg angle in degree
-		bragg_angle=asin((12.398/energy)/(2.0*spacing))*180.0/pi;
+		bragg_angle=asin((12.398/energy)/(2.0*spacing))*180.0/PI;
 	}
 
 	//calculate vector k0 at Bragg condition

@@ -16,7 +16,5 @@ public slots:
 	void enable();
 	void disable();
 	void add(Param*,bool inlined=false);
-	bool hdf5read(hid_t);
-	bool hdf5write(hid_t);
 };
 #endif

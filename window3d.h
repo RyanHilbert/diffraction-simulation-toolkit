@@ -17,7 +17,7 @@ class Window3D:public Qt3DWindow{
 	QPoint lastMousePosition=QPoint(0,0);
 
 	QEntity*root=new QEntity();
-	QEntity*crystals[8];
+	QEntity*crystals[9];
 	Vector3D*vectors[6];
 	QPhongAlphaMaterial*material=new QPhongAlphaMaterial();
 	Qt3DCore::QTransform*transform=new Qt3DCore::QTransform();
@@ -30,6 +30,7 @@ class Window3D:public Qt3DWindow{
 	QEntity*plane3D();
 	QEntity*cuboid3D();
 	QEntity*sphere3D();
+	QEntity*hemisphere3D();
 	QEntity*cylinder3D();
 	QEntity*cone3D();
 	QEntity*bicone3D();

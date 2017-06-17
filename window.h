@@ -1,5 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#ifdef _WIN32
+#include<QtWinExtras>
+#endif
 #include<QMainWindow>
 #include"param.h"
 #include"paramgroup.h"
@@ -21,25 +24,26 @@ class Window:public QMainWindow,private std::vector<ParamGroup*>{
 	QSpinBox*cpus=new QSpinBox(this);
 	QSpinBox*gpus=new QSpinBox(this);
 	QCheckBox*check3D=new QCheckBox("3D",this);
+	QErrorMessage*error=QErrorMessage::qtHandler();
+#ifdef _WIN32
+	QWinTaskbarButton*button=new QWinTaskbarButton(this);
+	void showEvent(QShowEvent*)override;
+#endif
 public:
-	const char*defaultTitle="xDiffraction";
-	const char*defaultFilename=".~";//simplest name for hidden temporary file
+	const char*defaultTitle="Diffraction Simulation Toolkit";
 	Window(QWindow*scene3D=0,QWidget*parent=0);
-	~Window();
 	using std::vector<ParamGroup*>::begin;
 	using std::vector<ParamGroup*>::end;
 signals:
 	void edited();
 public slots:
 	void clear();
-	bool exportiff();
 	bool load();
 	bool save();
-	bool hdf5read();
-	bool hdf5write();
 	void lock();
 	void unlock();
-	void upd8();
+	void read();
+	void write();
 private slots:
 	void onEdit();
 	void onFinish();

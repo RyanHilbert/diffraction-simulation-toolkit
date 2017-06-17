@@ -1,0 +1,15 @@
+Source: diffraction-simulation-toolkit
+Section: science
+Priority: optional
+Maintainer: Ryan Hilbert <rlhilbert@bnl.gov>
+Build-Depends: nvidia-cuda-toolkit, qt5-default (>= 5.7), debhelper (>= 8)
+Standards-Version: 3.9.4
+Homepage: <insert the upstream URL, if relevant>
+#Vcs-Git: git://git.debian.org/collab-maint/diffraction-simulation-toolkit.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/diffraction-simulation-toolkit.git;a=summary
+
+Package: diffraction-simulation-toolkit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: simulate dynamical diffraction experiments
+ The diffraction-simulation-toolkit simulates dynamical diffraction experiments.

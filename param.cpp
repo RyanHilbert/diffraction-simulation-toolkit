@@ -1,8 +1,10 @@
 #include"param.h"
+#include"tif.h"
 
-Param::Param(const char*name,void*dfault,QWidget*parent):QWidget(parent),data(dfault),layout(new QHBoxLayout(this)),label(new QLabel(name)),name(name){
+Param::Param(const signed char id,const char*name,void*dfault,QWidget*parent):QWidget(parent),data(dfault),layout(new QHBoxLayout(this)),label(new QLabel(name)),id(id),name(name){
 	layout->setMargin(0);
 	layout->addWidget(label);
+	connect(this,&Param::edited,this,&Param::write);
 }
 void Param::link(int flags){
 	if(links)setVisible(links&(1<<flags));
@@ -14,60 +16,61 @@ void Param::tip(QString string){
 	font.setUnderline(true);
 	label->setFont(font);
 }
-BoolParam::BoolParam(const char*name,bool*dfault,QWidget*parent):Param(name,dfault,parent),edit(new QCheckBox(name,this)){
+BoolParam::BoolParam(const signed char id,const char*name,bool*dfault,QWidget*parent):Param(id,name,dfault,parent),edit(new QCheckBox(name,this)){
 	layout->removeWidget(label);
 	delete label;
 	layout->addWidget(edit);
 	edit->setChecked(*dfault);
 	connect(edit,&QCheckBox::toggled,this,&Param::edited);
 }
-void BoolParam::upd8(){
+void BoolParam::read(){
+	const bool blocked = blockSignals(true);
+	edit->setChecked(*(bool*)data);
+	blockSignals(blocked);
+}
+void BoolParam::write(){
 	*(bool*)data=edit->isChecked();
 }
 void BoolParam::clear(){
 	edit->setChecked(false);
 }
-bool BoolParam::hdf5read(hid_t loc){
-	int attribute=h5int(name,loc);
-	bool blocked=blockSignals(true);
-	edit->setChecked(attribute);
-	blockSignals(blocked);
-	return attribute!=INT_MIN;
-}
-bool BoolParam::hdf5write(hid_t loc){
-	return h5set_int(edit->isChecked(),name,loc);
+void BoolParam::tip(QString string){
+	edit->setToolTip(string);
+	QFont font=edit->font();
+	font.setUnderline(true);
+	edit->setFont(font);
 }
 
-IntParam::IntParam(const char*name,int*dfault,QWidget*parent):Param(name,dfault,parent){
+IntParam::IntParam(const signed char id,const char*name,int*dfault,QWidget*parent):Param(id,name,dfault,parent){
 	edit->setMinimum(1);
 	edit->setMaximum(INT_MAX);
 	edit->setValue(*dfault);
 	layout->addWidget(edit);
 	connect(edit,(void(QSpinBox::*)(int))&QSpinBox::valueChanged,this,&Param::edited);
 }
-void IntParam::upd8(){
+void IntParam::read(){
+	const bool blocked = blockSignals(true);
+	edit->setValue(*(int*)data);
+	blockSignals(blocked);
+}
+void IntParam::write(){
 	*(int*)data=edit->text().toInt();
 }
 void IntParam::clear(){
 	edit->setValue(edit->minimum());
 }
-bool IntParam::hdf5read(hid_t loc){
-	int attribute=h5int(name,loc);
-	bool blocked=blockSignals(true);
-	edit->setValue(attribute);
-	blockSignals(blocked);
-	return attribute!=INT_MIN;
-}
-bool IntParam::hdf5write(hid_t loc){
-	return h5set_int(edit->value(),name,loc);
-}
 
-DoubleParam::DoubleParam(const char*name,double*dfault,QWidget*parent):Param(name,dfault,parent),edit(new QLineEdit(QString::number(*dfault),this)){
+DoubleParam::DoubleParam(const signed char id,const char*name,double*dfault,QWidget*parent):Param(id,name,dfault,parent),edit(new QLineEdit(QString::number(*dfault),this)){
 	edit->setValidator(new QDoubleValidator());
 	layout->addWidget(edit);
 	connect(edit,&QLineEdit::textChanged,this,&Param::edited);
 }
-void DoubleParam::upd8(){
+void DoubleParam::read(){
+	const bool blocked = blockSignals(true);
+	edit->setText(QString::number(*(double*)data/multiplier));
+	blockSignals(blocked);
+}
+void DoubleParam::write(){
 	*(double*)data=edit->text().toDouble()*multiplier;
 }
 void DoubleParam::clear(){
@@ -77,24 +80,15 @@ void DoubleParam::set(QString str){
 	edit->setText(str);
 }
 double DoubleParam::setMultiplier(double mul){
-	double temp=multiplier;
-	multiplier=mul;
+	double temp = multiplier;
+	multiplier = mul;
 	return temp;
 }
 QString DoubleParam::get(){
 	return edit->text();
 }
-bool DoubleParam::hdf5read(hid_t loc){
-	double attribute=h5double(name,loc);
-	bool blocked=blockSignals(true);
-	edit->setText(QString::number(attribute));
-	blockSignals(blocked);
-	return attribute==attribute;//will return false if attribute is NaN
-}
-bool DoubleParam::hdf5write(hid_t loc){
-	return h5set_double(edit->text().toDouble(),name,loc);
-}
-ComplexParam::ComplexParam(const char*name,complex*dfault,QWidget*parent):Param(name,dfault,parent),edit(new QLineEdit(QString::number(dfault->real()),this)),editI(new QLineEdit(QString::number(dfault->imag()),this)){
+
+ComplexParam::ComplexParam(const signed char id,const char*name,complex*dfault,QWidget*parent):Param(id,name,dfault,parent),edit(new QLineEdit(QString::number(dfault->real()),this)),editI(new QLineEdit(QString::number(dfault->imag()),this)){
 	edit->setValidator(new QDoubleValidator());
 	editI->setValidator(new QDoubleValidator());
 	layout->addWidget(edit);
@@ -104,30 +98,22 @@ ComplexParam::ComplexParam(const char*name,complex*dfault,QWidget*parent):Param(
 	connect(edit,&QLineEdit::textChanged,this,&Param::edited);
 	connect(editI,&QLineEdit::textChanged,this,&Param::edited);
 }
-void ComplexParam::upd8(){
+void ComplexParam::read(){
+	const complex c = *(complex*)data;
+	const bool blocked = blockSignals(true);
+	edit->setText(QString::number(c.real()));
+	editI->setText(QString::number(c.imag()));
+	blockSignals(blocked);
+}
+void ComplexParam::write(){
 	*(complex*)data=edit->text().toDouble()+I*editI->text().toDouble();
 }
 void ComplexParam::clear(){
 	edit->setText("");
 	editI->setText("");
 }
-bool ComplexParam::hdf5read(hid_t loc){
-	double buffer[2]={NAN,NAN};
-	bool result=false,blocked=blockSignals(true);
-#pragma omp critical(OMP_CRIT_HDF5)
-	{if(H5LTfind_attribute(loc,name))result=H5LTget_attribute_double(loc,".",name,buffer)>=0;}
-	edit->setText(QString::number(buffer[0]));
-	editI->setText(QString::number(buffer[1]));
-	blockSignals(blocked);
-	return result;
-}
-bool ComplexParam::hdf5write(hid_t loc){
-	bool result=false;
-#pragma omp critical(OMP_CRIT_HDF5)
-	{result=H5LTset_attribute_double(loc,".",name,(double*)data,2);}
-	return result;
-}
-VectorParam::VectorParam(const char*name,vector*dfault,QWidget*parent):Param(name,dfault,parent),editX(new QLineEdit(QString::number(dfault->x),this)),editY(new QLineEdit(QString::number(dfault->y),this)),editZ(new QLineEdit(QString::number(dfault->z),this)){
+
+VectorParam::VectorParam(const signed char id,const char*name,vector*dfault,QWidget*parent):Param(id,name,dfault,parent),editX(new QLineEdit(QString::number(dfault->x),this)),editY(new QLineEdit(QString::number(dfault->y),this)),editZ(new QLineEdit(QString::number(dfault->z),this)){
 	editX->setValidator(new QDoubleValidator(editX));
 	editY->setValidator(new QDoubleValidator(editY));
 	editZ->setValidator(new QDoubleValidator(editZ));
@@ -141,7 +127,15 @@ VectorParam::VectorParam(const char*name,vector*dfault,QWidget*parent):Param(nam
 	connect(editY,&QLineEdit::textChanged,this,&Param::edited);
 	connect(editZ,&QLineEdit::textChanged,this,&Param::edited);
 }
-void VectorParam::upd8(){
+void VectorParam::read(){
+	vector v = *(vector*)data;
+	const bool blocked = blockSignals(true);
+	editX->setText(QString::number(v.x));
+	editY->setText(QString::number(v.y));
+	editZ->setText(QString::number(v.z));
+	blockSignals(blocked);
+}
+void VectorParam::write(){
 	*(vector*)data={editX->text().toDouble(),editY->text().toDouble(),editZ->text().toDouble()};
 }
 void VectorParam::clear(){
@@ -157,70 +151,51 @@ void VectorParam::set(vector v){
 vector VectorParam::get(){
 	return{editX->text().toDouble(),editY->text().toDouble(),editZ->text().toDouble()};
 }
-bool VectorParam::hdf5read(hid_t loc){
-	double buffer[3]={NAN,NAN,NAN};
-	bool result=false,blocked=blockSignals(true);
-#pragma omp critical(OMP_CRIT_HDF5)
-	{if(H5LTfind_attribute(loc,name))result=H5LTget_attribute_double(loc,".",name,buffer)>=0;}
-	editX->setText(QString::number(buffer[0]));
-	editY->setText(QString::number(buffer[1]));
-	editZ->setText(QString::number(buffer[2]));
-	blockSignals(blocked);
-	return result;
-}
-bool VectorParam::hdf5write(hid_t loc){
-	bool result=false;
-#pragma omp critical(OMP_CRIT_HDF5)
-	{result=H5LTset_attribute_double(loc,".",name,(double*)data,3)>=0;}
-	return result;
-}
 
-FunctionParam::FunctionParam(const char*name,char**dfault,QWidget*parent):Param(name,dfault,parent),edit(new QLineEdit("0",this)){
+FunctionParam::FunctionParam(const signed char id,const char*name,char256*dfault,QWidget*parent):Param(id,name,dfault,parent),edit(new QLineEdit("0",this)){
+	edit->setMaxLength(255);
 	layout->addWidget(edit);
-	connect(edit,&QLineEdit::textChanged,this,&Param::edited);
 	connect(edit,&QLineEdit::editingFinished,[=]{//set our own validator to ensure the function is valid and only uses variables "x" "y" "z"
 		double x,y,z;
-		te_variable vars[]={{"x",&x},{"y",&y},{"z",&z}};
+		te_variable vars[]={{"x",&x,0,0},{"y",&y,0,0},{"z",&z,0,0}};
 		te_expr*expr=te_compile(edit->text().toUtf8().data(),vars,3,0);
 		if(expr)te_free(expr);
 		else edit->setText("0");
+		if(edit->isModified())emit edited();
+		edit->setModified(false);
 	});
 }
-void FunctionParam::upd8(){
+void FunctionParam::read(){
+	const char*str = *(char256*)data;
 	double x,y,z;
-	te_variable vars[]={{"x",&x},{"y",&y},{"z",&z}};
+	te_variable vars[]={{"x",&x,0,0},{"y",&y,0,0},{"z",&z,0,0}};
+	te_expr*expr=te_compile(str,vars,3,0);
+	const bool blocked = blockSignals(true);
+	if(expr){
+		te_free(expr);
+		edit->setText(str);
+	}else edit->setText("0");
+	blockSignals(blocked);
+}
+void FunctionParam::write(){
+	double x,y,z;
+	te_variable vars[]={{"x",&x,0,0},{"y",&y,0,0},{"z",&z,0,0}};
 	QByteArray array=edit->text().toUtf8();
 	char*str=array.data();
 	te_expr*expr=te_compile(str,vars,3,0);
 	if(expr){
 		te_free(expr);
-		int length=array.length()+1;
-		free(*(char**)data);
-		*(char**)data=(char*)malloc(length);
-		memcpy(*(char**)data,str,length);
-	}
-	else{
+		memcpy(*(char256*)data,str,array.length()+1);
+	}else{
 		edit->setText("0");
-		free(*(char**)data);
-		*(char**)data=0;
+		**(char256*)data=0;
 	}
 }
 void FunctionParam::clear(){
 	edit->setText("0");
 }
-bool FunctionParam::hdf5read(hid_t loc){
-	std::string attribute=h5string(name,loc);
-	bool blocked=blockSignals(true);
-	edit->setText(attribute.c_str());
-	blockSignals(blocked);
-	return!attribute.empty();
-}
-bool FunctionParam::hdf5write(hid_t loc){
-	QByteArray array=edit->text().toUtf8();
-	return h5set_string(array.data(),name,loc);
-}
 
-ComboParam::ComboParam(const char*name,int*dfault,std::initializer_list<QString>list,QWidget*parent):Param(name,dfault,parent),box(new QComboBox(this)){
+ComboParam::ComboParam(const signed char id,const char*name,char*dfault,std::initializer_list<QString>list,QWidget*parent):Param(id,name,dfault,parent),box(new QComboBox(this)){
 	QList<QString>qlist = QList<QString>();
 	for (QString string : list)qlist.append(string);
 	box->insertItems(0,qlist);
@@ -228,28 +203,21 @@ ComboParam::ComboParam(const char*name,int*dfault,std::initializer_list<QString>
 	connect(box,(void(QComboBox::*)(int))&QComboBox::currentIndexChanged,this,&ComboParam::currentIndexChanged);
 	connect(box,(void(QComboBox::*)(int))&QComboBox::currentIndexChanged,this,&ComboParam::edited);
 }
-void ComboParam::upd8(){
-	*(int*)data=box->currentIndex();
+void ComboParam::read(){
+	const bool blocked = blockSignals(true);
+	box->setCurrentIndex(*(char*)data);
+	blockSignals(blocked);
+	emit currentIndexChanged(box->currentIndex());
+}
+void ComboParam::write(){
+	*(char*)data=box->currentIndex();
 }
 void ComboParam::clear(){
 	box->setCurrentIndex(-1);
 }
-bool ComboParam::hdf5read(hid_t loc){
-	std::string attribute=h5string(name,loc);
-	bool blocked=blockSignals(true);
-	box->setCurrentIndex(box->findText(QString::fromStdString(attribute)));
-	blockSignals(blocked);
-	emit currentIndexChanged(box->currentIndex());
-	return!attribute.empty();
-}
-bool ComboParam::hdf5write(hid_t loc){
-	QByteArray array=box->currentText().toUtf8();
-	return h5set_string(array.data(),name,loc);
-}
-
-BoolParam*newParam(const char*name,bool*dfault,QWidget*parent){return new BoolParam(name,dfault,parent);}
-IntParam*newParam(const char*name,int*dfault,QWidget*parent){return new IntParam(name,dfault,parent);}
-DoubleParam*newParam(const char*name,double*dfault,QWidget*parent){return new DoubleParam(name,dfault,parent);}
-ComplexParam*newParam(const char*name,complex*dfault,QWidget*parent){return new ComplexParam(name,dfault,parent);}
-VectorParam*newParam(const char*name,vector*dfault,QWidget*parent){return new VectorParam(name,dfault,parent);}
-FunctionParam*newParam(const char*name,char**dfault,QWidget*parent){return new FunctionParam(name,dfault,parent);}
+BoolParam*newParam(const signed char id,const char*name,bool*dfault,QWidget*parent){return new BoolParam(id,name,dfault,parent);}
+IntParam*newParam(const signed char id,const char*name,int*dfault,QWidget*parent){return new IntParam(id,name,dfault,parent);}
+DoubleParam*newParam(const signed char id,const char*name,double*dfault,QWidget*parent){return new DoubleParam(id,name,dfault,parent);}
+ComplexParam*newParam(const signed char id,const char*name,complex*dfault,QWidget*parent){return new ComplexParam(id,name,dfault,parent);}
+VectorParam*newParam(const signed char id,const char*name,vector*dfault,QWidget*parent){return new VectorParam(id,name,dfault,parent);}
+FunctionParam*newParam(const signed char id,const char*name,char256*dfault,QWidget*parent){return new FunctionParam(id,name,dfault,parent);}

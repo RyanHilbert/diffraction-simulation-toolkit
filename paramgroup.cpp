@@ -17,22 +17,6 @@ void ParamGroup::enable(){
 void ParamGroup::disable(){
 	for(auto param:*this)param->setEnabled(false);
 }
-bool ParamGroup::hdf5read(hid_t loc){
-	bool result=true;
-	QByteArray array=title().toUtf8();
-	hid_t group=h5group(array.data(),loc);
-	for(Param*param:*this)result&=param->hdf5read(group);
-	H5Gclose(group);
-	return result;
-}
-bool ParamGroup::hdf5write(hid_t loc){
-	bool result=true;
-	QByteArray array=title().toUtf8();
-	hid_t group=h5group(array.data(),loc);
-	for(Param*param:*this)result&=param->hdf5write(group);
-	H5Gclose(group);
-	return result;
-}
 void ParamGroup::add(Param*param,bool inlined){
 	if(!inlined)layout->addLayout(line=new QHBoxLayout());
 	line->addWidget(param);
