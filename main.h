@@ -61,15 +61,7 @@ extern int g_max_gpus;//global maximum number of GPUs to use in calculation
 int get_num_procs_omp();
 size_t get_num_iterations();
 
-int getDeviceCountCuda();
-int getMaxThreadsPerBlockCuda();
-void setDeviceCuda(int);
-void*mallocCuda(size_t);
-void freeCuda(void*);
-void memsetCuda(void*,int,size_t);
-void kernelCuda(size_t,size_t,vector*,void*,double,double,vector,double,double);
-void memcpyHostToDeviceCuda(void*,const void*,size_t);
-void memcpyDeviceToHostCuda(void*,const void*,size_t);
+size_t getDeviceCountOpenCL();
 
 vector vec_unit(vector);
 vector vec_num(double,vector);

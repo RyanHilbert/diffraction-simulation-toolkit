@@ -19,8 +19,8 @@ class Window:public QMainWindow,private std::vector<ParamGroup*>{
 	DialogButton*spacingButton;
 	DialogButton*directionButton;
 	QCheckBox*editable=new QCheckBox("Allow Editing");
-	QPushButton*start=new QPushButton("Start Calculation");
-	QPushButton*pause=new QPushButton("Pause Calculation");
+	QPushButton*start=new QPushButton("Start Calc");
+	QPushButton*pause=new QPushButton("Pause Calc");
 	QSpinBox*cpus=new QSpinBox(this);
 	QSpinBox*gpus=new QSpinBox(this);
 	QCheckBox*check3D=new QCheckBox("3D",this);
