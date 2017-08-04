@@ -385,7 +385,8 @@ void calc(){
 			if(!(cl_det = mallocOpenCL(device.queue,det_para.row*det_para.col*sizeof*det,0))||!(cl_det_pix = mallocOpenCL(device.queue,det_para.row*det_para.col*sizeof*det_pix,det_pix))){
 				printf("Thread %d falling back to CPU - Failed to allocate memory on OpenCL device %zu",thread_id,thread_id%device_count);
 				thread_device_count = 0;
-				device = {0,0};
+				device.queue = 0;
+				device.program = 0;
 			}
 		}
 		///all printing in one statement eliminates concurrency issues
@@ -786,7 +787,7 @@ void calc(){
 					}
 				}
 				//propagate to farfield detector
-RESTART:///used in case of OpenCL device failure
+RESTART:;///used in case of OpenCL device failure
 				int flag = 0;
 				complex val_temp;
 				vector pos_temp;
