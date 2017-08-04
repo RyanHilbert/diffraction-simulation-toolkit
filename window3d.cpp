@@ -144,8 +144,8 @@ Window3D::Window3D(){
 	material->setAmbient(Qt::darkGray);
 
 	QCamera*cam=camera();
-	cam->setUpVector(QVector3D(0,0,1));
 	cam->setPosition(QVector3D(4,4,4));
+	cam->setUpVector(QVector3D(0,0,1));
 	cam->setViewCenter(QVector3D(0,0,0));
 
 	crystals[CUBOID]=cuboid3D();
