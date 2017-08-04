@@ -13,7 +13,8 @@ unix:SOURCES += shaders/calc.c
 SOURCES += coloredlabel.cpp dialog.cpp dialogbutton.cpp directioncalculator.cpp main.cpp param.cpp paramgroup.cpp qcustomplot.cpp spacingcalculator.cpp spectrogram.cpp spectromanager.cpp thread.cpp tinyexpr.c vector3d.cpp window.cpp window3d.cpp
 
 DISTFILES += configure README.md LICENSE.txt debian/*
-win32:LIBS += -L$$(CUDA_PATH)/lib/x64 -L$$(AMDAPPSDKROOT)/lib/x86_64 -L$$(INTELOCLSDKROOT)/lib64 -lOpenCL
+LIBS += -lOpenCL
+win32:LIBS += -L$$(CUDA_PATH)/lib/x64 -L$$(AMDAPPSDKROOT)/lib/x86_64 -L$$(INTELOCLSDKROOT)/lib64
 unix:LIBS += -fopenmp -lrt -ldl
 
 win32:INCLUDEPATH += $$(CUDA_PATH)/include $$(AMDAPPSDKROOT)/include $$(INTELOCLSDKROOT)/include
