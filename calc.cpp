@@ -68,7 +68,7 @@ static inline double sq(double n){return n*n;}
 extern"C"{
 #define VLA(VLA,...) *VLA=(decltype(VLA))memset(alloca((__VA_ARGS__)<1?1:(__VA_ARGS__)*sizeof*VLA),0,(__VA_ARGS__)*sizeof*VLA)
 #else
-#define VLA(VLA,...) VLA[(__VA_ARGS__)<1?1:(__VA_ARGS__)]={0};
+#define VLA(VLA,...) VLA[(__VA_ARGS__)<1?1:(__VA_ARGS__)];memset(VLA,0,sizeof VLA);
 #endif
 #define KERNEL_NAME "kernl"
 #define printf(...) {char str[BUFSIZ];sprintf(str,__VA_ARGS__);emit_output(str);}
