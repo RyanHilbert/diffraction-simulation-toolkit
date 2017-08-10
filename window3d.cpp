@@ -170,7 +170,7 @@ Window3D::Window3D(){
 	yaxis->setDirection(0,1,0);
 	zaxis->setDirection(0,0,1);
 
-	update();
+	connect(this,&QWindow::windowStateChanged,this,&Window3D::update);
 }
 void Window3D::update(){
 	for(size_t i=0;i<sizeof(crystals)/sizeof(*crystals);++i)crystals[i]->setEnabled(false);

@@ -2,11 +2,11 @@ Source: diffraction-simulation-toolkit
 Section: science
 Priority: optional
 Maintainer: Ryan Hilbert <rlhilbert@bnl.gov>
-Build-Depends: opencl-headers, opencl-icd, qt5-default (>= 5.7), debhelper (>= 8)
+Build-Depends: ocl-icd-opencl-dev (>= 1.1), qtbase5-dev (>= 5.7), debhelper (>= 8)
 Standards-Version: 3.9.4
-Homepage: <insert the upstream URL, if relevant>
-#Vcs-Git: git://git.debian.org/collab-maint/diffraction-simulation-toolkit.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/diffraction-simulation-toolkit.git;a=summary
+Homepage: https://github.com/R-Hilbert/diffraction-simulation-toolkit#readme
+Vcs-Git: https://github.com/R-Hilbert/diffraction-simulation-toolkit.git
+Vcs-Browser: https://github.com/R-Hilbert/diffraction-simulation-toolkit
 
 Package: diffraction-simulation-toolkit
 Architecture: any
