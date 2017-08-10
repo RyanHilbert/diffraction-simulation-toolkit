@@ -112,10 +112,13 @@ Window::Window(QWindow*scene3D,QWidget*parent):QMainWindow(parent){
 		stack->addWidget(new QWidget(this));
 		stack->addWidget(frame3D);
 		QVBoxLayout*layout3D=new QVBoxLayout(frame3D);
-		scene3D->show();
-		QWidget*widget3D=QWidget::createWindowContainer(scene3D,frame3D);
-		widget3D->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
-		layout3D->addWidget(widget3D);
+		if(scene3D){
+			scene3D->show();
+			QWidget*widget3D=QWidget::createWindowContainer(scene3D,frame3D);
+			connect(this,&Window::edited,scene3D,&QWindow::activeChanged);
+			widget3D->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::MinimumExpanding);
+			layout3D->addWidget(widget3D);
+		}
 		QHBoxLayout*labels=new QHBoxLayout();
 		layout3D->addLayout(labels);
 		new ColoredLabel(Qt::red,"x axis",labels);

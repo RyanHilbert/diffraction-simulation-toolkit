@@ -170,6 +170,7 @@ Window3D::Window3D(){
 	yaxis->setDirection(0,1,0);
 	zaxis->setDirection(0,0,1);
 
+	connect(this,&QWindow::activeChanged,this,&Window3D::update);
 	connect(this,&QWindow::windowStateChanged,this,&Window3D::update);
 }
 void Window3D::update(){

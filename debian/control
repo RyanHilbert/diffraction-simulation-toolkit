@@ -2,7 +2,7 @@ Source: diffraction-simulation-toolkit
 Section: science
 Priority: optional
 Maintainer: Ryan Hilbert <rlhilbert@bnl.gov>
-Build-Depends: ocl-icd-opencl-dev (>= 1.1), qtbase5-dev (>= 5.7), debhelper (>= 8)
+Build-Depends: qtbase5-dev, ocl-icd-opencl-dev (>= 1.1), debhelper (>= 8)
 Standards-Version: 3.9.4
 Homepage: https://github.com/R-Hilbert/diffraction-simulation-toolkit#readme
 Vcs-Git: https://github.com/R-Hilbert/diffraction-simulation-toolkit.git

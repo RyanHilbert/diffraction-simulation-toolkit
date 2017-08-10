@@ -1,7 +1,9 @@
 #include<QApplication>
 #include<QtPlugin>
 #include"window.h"
+#ifdef _WIN32
 #include"window3d.h"
+#endif
 #define FOREACH(tag,name,type,var,...) type var = __VA_ARGS__;
 #include"main.h"
 static const char*_(){
@@ -19,10 +21,12 @@ FILE*tif=0;
 int main(int argc,char*argv[]){
 	QApplication app(argc,argv);
 	Q_INIT_RESOURCE(shaders);
-	Window3D*window3D=new Window3D();
+	QWindow*window3D=0;
+#ifdef _WIN32
+	window3D=new Window3D();
+#endif
 	Window window(window3D);
 	window.show();
-	QObject::connect(&window,&Window::edited,window3D,&Window3D::update);
 	emit window.edited();
 	return app.exec();
 }
