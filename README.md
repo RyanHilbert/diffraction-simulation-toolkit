@@ -2,7 +2,7 @@
 The Diffraction Simulation Toolkit allows simulation of dynamical diffraction experiments via a user-friendly graphical interface.
 
 ## Installation
-This software is made available as a standalone executable (.exe) file on Windows and as a Debian source package (.dsc) elsewhere.
+This software is made available as a standalone executable (.exe) file on Windows and as a Debian source package (.dsc) on Linux.
 
 ## Authors
 Produced at Brookhaven National Laboratory by:
